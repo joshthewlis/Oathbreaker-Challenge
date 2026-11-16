@@ -2,7 +2,7 @@
 """Generate a compact static browser catalogue from MTGJSON.
 
 pip install ijson; run using GitHub Actions (not per visitor).
-Pricing: minimum normal-finish Cardmarket paper retail EUR price among
+Pricing: minimum nonfoil-finish Cardmarket paper retail EUR price among
 regular English paper printings; converted at an automatically fetched EUR/GBP rate.
 """
 import argparse
@@ -51,7 +51,7 @@ def eligible(card):
     if 'paper' not in card.get('availability',[]):return False
     if str(card.get('language','English')).lower()!='english':return False
     if card.get('isPromo') or card.get('isOnlineOnly') or card.get('isOversized') or card.get('isAlternative') or card.get('isFunny'):return False
-    if 'nonfoil' not in card.get('finishes', []):return False
+    if 'nonfoil' not in card.get('finishes',[]):return False
     return True
 
 def build(prices_file=None, cards_file=None, fx_file=None, output='cards-index.json'):
@@ -69,10 +69,20 @@ def build(prices_file=None, cards_file=None, fx_file=None, output='cards-index.j
         item=result.get(key)
         if not item:
             item={'name':name,'type':card.get('type',''),'colors':card.get('colorIdentity',[]),
-                  'legality':card.get('legalities',{}).get('oathbreaker','not_legal'),
+                  'legality':'unknown',
                   'text':card.get('text',''),'basic':key in BASICS or 'Basic Land' in card.get('type',''),
                   'set':None,'eur':None,'priceDate':None}
             result[key]=item
+        # Legality belongs to the card, not its cheapest printing. In particular,
+        # older/odd printing records may report not_legal or omit the format.
+        # Prefer an explicit Legal result found on ANY eligible printing.
+        raw_legality=str((card.get('legalities') or {}).get('oathbreaker') or 'unknown').lower().replace(' ', '_')
+        previous=item['legality']
+        if raw_legality=='legal':
+            item['legality']='legal'
+        elif previous!='legal' and raw_legality in ('banned','restricted'):
+            item['legality']=raw_legality
+        # not_legal/unknown is inconclusive: do not use it as a ban.
         price_info=prices.get(uuid)
         if price_info:
             date,eur=price_info
