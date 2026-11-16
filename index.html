@@ -48,8 +48,8 @@
   <section id="rules" aria-labelledby="rules-title">
     <div class="section-head"><span class="kicker">01 · House Rules</span><h2 id="rules-title">Six simple rules</h2><p>Enough structure to keep things fair, without turning deckbuilding into a list of things you can't do.</p></div>
     <div class="rules">
-      <article class="rule"><span class="number">01</span><h3>£75 deck budget</h3><p>Your complete <b>60-card deck</b>, including Oathbreaker and Signature Spell, must cost no more than £75.</p></article>
-      <article class="rule"><span class="number">02</span><h3>£7.50 card limit</h3><p>No individual card may have a price higher than £7.50.</p></article>
+      <article class="rule"><span class="number">01</span><h3>£75 deck budget</h3><p>Your complete <b>60-card deck</b>, including Oathbreaker and Signature Spell, must cost no more than £75. <b>Basic lands are excluded from the budget</b> and count as £0.00; nonbasic lands count normally.</p></article>
+      <article class="rule"><span class="number">02</span><h3>£7.50 card limit</h3><p>No individual nonbasic-land card may have a price higher than £7.50. Basic lands count as £0.00.</p></article>
       <article class="rule"><span class="number">03</span><h3>Lowest card price</h3><p>Use the <b>lowest available regular-printing price</b>. Postage doesn't count. Agree on a shared price source before submitting decks.</p></article>
       <article class="rule"><span class="number">04</span><h3>Oathbreaker legality</h3><p>Normal Oathbreaker deckbuilding rules and the <a href="https://oathbreakermtg.org/banned-list/" target="_blank" rel="noopener noreferrer">official ban list</a> apply.</p></article>
       <article class="rule"><span class="number">05</span><h3>No command-zone infinites</h3><p>No infinite combos involving your <b>Oathbreaker and/or Signature Spell</b>. Other combos are allowed.</p></article>
@@ -265,7 +265,8 @@
           wipeNames.push(`${item.name} (${item.role})`);
           if(item.role==='Signature Spell')issues.push(`${item.name}: possible mass removal Signature Spell — not permitted under house rules.`);
         }
-        const eur=card.prices?.eur===null?NaN:Number(card.prices?.eur),gbp=fx&&Number.isFinite(eur)&&eur>0?eur*fx:null;
+        const isBasicLand=/\bBasic Land\b/i.test(card.type_line||'');
+        const eur=card.prices?.eur===null?NaN:Number(card.prices?.eur),gbp=isBasicLand?0:(fx&&Number.isFinite(eur)&&eur>0?eur*fx:null);
         if(gbp===null)unpriced+=item.qty;
         else{sum+=gbp*item.qty;if(gbp>7.5)issues.push(`${item.name}: ${price(gbp)} exceeds £7.50 per card (indicative printing).`);}
         details.push({name:card.name,qty:item.qty,gbp});
