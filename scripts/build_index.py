@@ -51,7 +51,7 @@ def eligible(card):
     if 'paper' not in card.get('availability',[]):return False
     if str(card.get('language','English')).lower()!='english':return False
     if card.get('isPromo') or card.get('isOnlineOnly') or card.get('isOversized') or card.get('isAlternative') or card.get('isFunny'):return False
-    if 'normal' not in card.get('finishes',[]):return False
+    if 'nonfoil' not in card.get('finishes', []):return False
     return True
 
 def build(prices_file=None, cards_file=None, fx_file=None, output='cards-index.json'):
