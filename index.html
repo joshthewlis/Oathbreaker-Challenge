@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101713">
+  <meta name="description" content="A casual £75 Oathbreaker challenge: six simple deckbuilding rules, a friendly power level and room for memorable Magic games.">
+  <title>Christmas Oathbreaker Challenge — House Rules & Deck Checker</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101713;--panel:#1b251f;--panel2:#202d25;--border:#3a4d3d;--ink:#f3f0df;--muted:#b2bcae;--gold:#e4bd70;--gold2:#f5d996;--green:#8bb69a;--radius:18px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body::before{content:"";pointer-events:none;position:absolute;inset:0 0 auto;height:790px;background:radial-gradient(ellipse 55% 55% at 50% 8%,#425b3c78,transparent 75%),radial-gradient(ellipse 30% 42% at 85% 25%,#93693438,transparent 80%);z-index:-1}
+    a{color:var(--gold2)}a:hover{color:#fff0c4}button{font:inherit}::selection{background:#e4bd70;color:#18241d}
+    .wrap{width:min(1080px,calc(100% - 40px));margin:auto}.top{display:flex;align-items:center;justify-content:flex-end;gap:20px;padding:24px 0}.brand{display:flex;align-items:center;gap:12px;font-family:Georgia,serif;font-size:18px;font-weight:bold;letter-spacing:.03em;text-decoration:none;color:var(--ink)}.sigil{display:grid;place-items:center;width:38px;height:38px;border:1px solid #9c885c;border-radius:12px;color:var(--gold);background:#1c2a21;font-size:24px}.top nav{display:flex;gap:22px;align-items:center}.top nav a{color:var(--muted);font-size:14px;text-decoration:none}.top nav a:hover{color:var(--gold)}
+    .hero{text-align:center;padding:92px 0 80px}.eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid #9a895c66;border-radius:99px;padding:6px 16px;letter-spacing:.18em;text-transform:uppercase;font-size:11px;font-weight:800;color:var(--gold2);background:#1c291eaa}.hero h1{font:normal clamp(46px,7.8vw,86px)/1.04 Georgia,"Times New Roman",serif;letter-spacing:-.045em;margin:25px auto 18px;max-width:900px}.hero h1 em{font-style:normal;color:var(--gold)}.hero .lede{font-size:clamp(16px,2.3vw,20px);max-width:620px;margin:0 auto;color:#cbd4c4}.hero-actions{margin-top:32px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.btn{border:1px solid #8d7c53;border-radius:10px;padding:12px 20px;text-decoration:none;color:#152119;background:var(--gold);font-size:14px;font-weight:800;cursor:pointer;transition:transform .2s,background .2s}.btn:hover{background:#f3d498;color:#152119;transform:translateY(-2px)}.btn.secondary{background:#233128;color:var(--ink);border-color:var(--border)}.btn.secondary:hover{background:#304234}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:730px;margin:43px auto 0}.stat{background:#1c291fbb;border:1px solid #6b755245;border-radius:16px;padding:18px}.stat strong{display:block;color:var(--gold2);font:normal 35px/1.2 Georgia,serif}.stat span{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#b6c2b0;font-weight:750}
+    main{padding-bottom:70px}.section-head{text-align:center;margin-bottom:30px}.section-head .kicker{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.17em;color:var(--gold);font-weight:800;margin-bottom:8px}.section-head h2{font:normal clamp(31px,4vw,43px)/1.2 Georgia,serif;letter-spacing:-.025em;margin:0 0 8px}.section-head p{color:var(--muted);margin:0 auto;max-width:670px}.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.rule{min-height:200px;padding:25px;background:linear-gradient(145deg,#223027,#19241e);border:1px solid var(--border);border-radius:var(--radius);position:relative;overflow:hidden}.rule:after{content:"";width:120px;height:120px;position:absolute;right:-70px;top:-70px;border:1px solid #ba9e6340;transform:rotate(45deg)}.number{color:var(--gold);font:normal 28px Georgia,serif}.rule h3{font:normal 21px Georgia,serif;margin:12px 0 9px}.rule p{font-size:14px;margin:0;color:#c6d0c3}.rule b{color:var(--ink)}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,#a18a5969,transparent);margin:65px 0}.guides{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.guide{padding:24px 25px;display:flex;gap:17px;background:#19251f;border:1px solid #344c3a;border-radius:14px}.guide .symbol{display:grid;flex:none;place-items:center;color:var(--gold);border:1px solid #6b714e;border-radius:10px;width:38px;height:38px;font-family:Georgia,serif;font-size:23px}.guide h3{font-size:16px;margin:0 0 6px}.guide p{font-size:14px;color:var(--muted);margin:0}
+    .ban-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.ban-card{background:linear-gradient(145deg,#223027,#19241e);border:1px solid var(--border);border-radius:var(--radius);padding:24px}.ban-heading{display:flex;align-items:center;gap:14px;margin-bottom:18px}.ban-icon{width:43px;height:43px;border:1px solid #b99a5f;border-radius:12px;display:grid;place-items:center;color:var(--gold2);font:normal 25px Georgia,serif;flex-shrink:0}.commander-icon{border-color:#719582;color:#9bc6ab}.ban-heading h3{font:normal 22px Georgia,serif;margin:0 0 3px}.ban-heading p{margin:0;color:var(--muted);font-size:13px}.ban-list{list-style:none;margin:0;padding:0;columns:1}.ban-list li{padding:7px 0;border-bottom:1px solid #ffffff12;color:#e4e9dc;font-size:14px;break-inside:avoid}.ban-list li:last-child{border-bottom:0}.ban-note{max-width:860px;margin:20px auto 0;color:var(--muted);font-size:13px;text-align:center}.ban-note strong{color:var(--ink)}
+    .faq{max-width:850px;margin:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.faq-item{border:1px solid var(--border);background:#1a261f;border-radius:14px;padding:20px 22px}.faq-item h3{font-size:15px;line-height:1.4;margin:0 0 10px;color:var(--ink)}.faq-item p{font-size:14px;color:var(--muted);margin:0}
+    .closing{text-align:center;padding:41px 30px;border:1px solid #8e7c4c70;border-radius:23px;background:radial-gradient(ellipse at center,#314131,#19251e 75%);margin-top:67px}.closing h2{font:normal clamp(27px,4.1vw,43px) Georgia,serif;color:var(--gold2);margin:0 0 10px}.closing p{color:#c9d4c6;margin:0 auto 23px;max-width:550px}.footer{border-top:1px solid #3c4c3d;padding:24px 0 38px;display:flex;justify-content:space-between;align-items:center;gap:20px;color:#a8b6a8;font-size:13px}.footer div:last-child{display:flex;gap:20px}
+    @media(max-width:780px){.rules{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{padding:65px 0 62px}.top nav{gap:14px}}
+    @media(max-width:570px){.wrap{width:min(100% - 30px,1080px)}.top nav a:nth-child(2){display:none}.brand{font-size:15px}.hero{padding:45px 0 55px}.stats{gap:8px}.stat{padding:13px 5px}.stat strong{font-size:28px}.stat span{font-size:10px}.rules,.guides,.ban-columns,.faq{grid-template-columns:1fr}.rule{min-height:unset;padding:23px}.divider{margin:50px 0}.footer{flex-direction:column;text-align:center;gap:8px}.faq-item{padding:18px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
+    @media print{body{background:white;color:#111;font-size:12px}body:before,.top nav,.hero-actions,.footer,.closing .btn{display:none}.hero{padding:18px 0}.hero h1{font-size:44px}.rule,.guide,.closing{background:white;border:1px solid #bbb;break-inside:avoid}.rule p,.guide p,.section-head p,.hero .lede,.closing p{color:#333}.number,.hero h1 em,.stat strong,.closing h2{color:#664b16}.stats{margin-top:15px}.stat{background:white;border:1px solid #bbb}.stat span{color:#444}.divider{margin:22px 0}.rule{min-height:150px}.faq{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+    .comparison-guide{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin:0 0 18px;color:var(--muted);font-size:13px}.comparison-guide>span{display:flex;align-items:center;gap:9px}
+    .ban-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:#1b251f}.ban-table{width:100%;border-collapse:collapse;text-align:center}.ban-table thead{background:#2a392d}.ban-table thead th{padding:16px 12px;font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--gold2)}.ban-table thead th:nth-child(2){width:58%}.ban-table tbody tr{border-top:1px solid #ffffff13}.ban-table tbody tr:nth-child(even){background:#ffffff07}.ban-table tbody tr:hover{background:#334435}.ban-table tbody td,.ban-table tbody th{padding:10px 13px}.ban-table tbody th{font-size:15px;text-align:center;font-weight:550}.status{display:inline-block;min-width:78px;padding:4px 12px;border:1px solid transparent;border-radius:999px;font-size:12px;font-weight:800;line-height:1.5}.status.banned{color:#ffb9b9;background:#622f355e;border-color:#a65c5e}.status.legal{color:#a8e8bd;background:#255b3c6a;border-color:#498561}
+    @media(max-width:570px){.ban-table thead th{padding:11px 6px;font-size:11px}.ban-table tbody td,.ban-table tbody th{padding:10px 5px}.ban-table tbody th{font-size:13px}.status{min-width:61px;padding:3px 6px;font-size:11px}.comparison-guide{gap:10px}}
+
+    .check-card{background:linear-gradient(145deg,#25362a,#17231c);border:1px solid var(--border);border-radius:18px;padding:26px;max-width:900px;margin:auto}.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:block;font-size:13px;font-weight:700;color:var(--gold2);margin-bottom:6px}.check-card input,.check-card textarea,.check-card select{width:100%;background:#0e1913;border:1px solid #53684f;border-radius:9px;color:var(--ink);padding:11px;font:inherit}.check-card textarea{resize:vertical;min-height:195px;font-family:ui-monospace,monospace;font-size:13px}.check-card input:focus,.check-card textarea:focus,.check-card select:focus{outline:2px solid #bfa66d}.check-card .help{font-size:13px;color:var(--muted);margin:10px 0}.check-card .btn:disabled{opacity:.6;cursor:wait}.report{margin-top:20px}.report h3{font:normal 24px Georgia,serif;margin:0 0 12px}.report-row{padding:10px 0;border-bottom:1px solid #ffffff17;display:flex;justify-content:space-between;gap:20px;align-items:center;font-size:14px}.report-row span:first-child{min-width:0}.report-good{color:#abeac0}.report-bad{color:#ffb9b9}.report-warn{color:#f2d69a}.report-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:15px}.report-table th,.report-table td{text-align:left;border-bottom:1px solid #ffffff17;padding:9px 5px}.report-table th:last-child,.report-table td:last-child{text-align:right}.check-note{color:var(--muted);font-size:12px;margin:15px 0 0}
+    @media(max-width:570px){.check-grid{grid-template-columns:1fr}.check-card{padding:18px}.report-row{gap:12px}}
+  </style>
+</head>
+<body>
+<header class="top wrap">
+  
+  <nav aria-label="Page navigation"><a href="#rules">The rules</a><a href="#guidelines">Our approach</a><a href="#ban-differences">Ban list differences</a><a href="#deck-check">Deck checker</a><a href="#faq">FAQ</a></nav>
+</header>
+<section class="hero wrap" id="top">
+  
+  <h1>Christmas<br><em>Oathbreaker Challenge</em></h1>
+  <p class="lede">A £75 Oathbreaker challenge built around clever decks, meaningful interaction and making sure everyone gets to play Magic.</p>
+  <div class="hero-actions"><a class="btn" href="#rules">Explore the rules ↓</a><button class="btn secondary" id="share" type="button">Copy page link ↗</button></div>
+  <div class="stats" aria-label="Challenge limits"><div class="stat"><strong>60</strong><span>Cards per deck</span></div><div class="stat"><strong>£75</strong><span>Total budget</span></div><div class="stat"><strong>£7.50</strong><span>Per-card cap</span></div></div>
+</section>
+<main class="wrap">
+  <section id="rules" aria-labelledby="rules-title">
+    <div class="section-head"><span class="kicker">01 · House Rules</span><h2 id="rules-title">Six simple rules</h2><p>Enough structure to keep things fair, without turning deckbuilding into a list of things you can't do.</p></div>
+    <div class="rules">
+      <article class="rule"><span class="number">01</span><h3>£75 deck budget</h3><p>Your complete <b>60-card deck</b>, including Oathbreaker and Signature Spell, must cost no more than £75.</p></article>
+      <article class="rule"><span class="number">02</span><h3>£7.50 card limit</h3><p>No individual card may have a price higher than £7.50.</p></article>
+      <article class="rule"><span class="number">03</span><h3>Lowest card price</h3><p>Use the <b>lowest available regular-printing price</b>. Postage doesn't count. Agree on a shared price source before submitting decks.</p></article>
+      <article class="rule"><span class="number">04</span><h3>Oathbreaker legality</h3><p>Normal Oathbreaker deckbuilding rules and the <a href="https://oathbreakermtg.org/banned-list/" target="_blank" rel="noopener noreferrer">official ban list</a> apply.</p></article>
+      <article class="rule"><span class="number">05</span><h3>No command-zone infinites</h3><p>No infinite combos involving your <b>Oathbreaker and/or Signature Spell</b>. Other combos are allowed.</p></article>
+      <article class="rule"><span class="number">06</span><h3>One mass removal spell</h3><p>Maximum <b>one mass removal spell</b> in your main deck (creatures, artifacts, lands, etc.). It cannot be your Signature Spell. Graveyard recursion is allowed.</p></article>
+    </div>
+  </section>
+  <div class="divider" role="presentation"></div>
+  <section id="guidelines" aria-labelledby="guides-title">
+    <div class="section-head"><span class="kicker">02 · Spirit of the game</span><h2 id="guides-title">Play hard. Keep it friendly.</h2><p>These are guidelines, not extra bans. Creative decks and powerful cards are part of the fun.</p></div>
+    <div class="guides">
+      <div class="guide"><span class="symbol" aria-hidden="true">✧</span><div><h3>Command-zone synergy</h3><p>Avoid overwhelming, difficult-to-interact-with combinations that are guaranteed from the start.</p></div></div>
+      <div class="guide"><span class="symbol" aria-hidden="true">∞</span><div><h3>Combos are fine</h3><p>Strong interactions are welcome. Try not to build around consistently ending games before they've really started.</p></div></div>
+      <div class="guide"><span class="symbol" aria-hidden="true">↗</span><div><h3>Interaction matters</h3><p>Removal, counterspells and combat tricks are encouraged. Everyone should have chances to respond.</p></div></div>
+      <div class="guide"><span class="symbol" aria-hidden="true">♜</span><div><h3>Casual power level</h3><p>Build something that can win, without feeling obliged to optimise every game into the same result.</p></div></div>
+    </div>
+  </section>
+  <div class="divider" role="presentation"></div>
+  <section id="ban-differences" aria-labelledby="ban-title">
+    <div class="section-head"><span class="kicker">03 · Format comparison</span><h2 id="ban-title">Commander vs Oathbreaker</h2><p>One alphabetical list of every individually named card banned in either format. Compare each card's status side by side.</p></div>
+    <div class="comparison-guide"><span><span class="status banned">Banned</span> Not playable in that format</span><span><span class="status legal">Legal</span> Not on that format's ban list</span></div>
+    <div class="ban-table-wrap"><table class="ban-table"><thead><tr><th scope="col">Commander</th><th scope="col">Card</th><th scope="col">Oathbreaker</th></tr></thead><tbody>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Ad Nauseam</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Ancestral Recall</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Balance</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Biorhythm</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Black Lotus</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Channel</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Chaos Orb</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Dark Ritual</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Dockside Extortionist</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Doomsday</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Emrakul, the Aeons Torn</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Erayo, Soratami Ascendant</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Expropriate</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Falling Star</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Fastbond</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Flash</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Golos, Tireless Pilgrim</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Griselbrand</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">High Tide</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Hullbreacher</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Iona, Shield of Emeria</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Jeweled Lotus</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Karakas</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Leovold, Emissary of Trest</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Library of Alexandria</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Limited Resources</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Lion&#x27;s Eye Diamond</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Mana Crypt</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Mana Geyser</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Mana Vault</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Mox Emerald</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Mox Jet</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Mox Pearl</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Mox Ruby</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Mox Sapphire</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Nadu, Winged Wisdom</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Natural Order</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Painter&#x27;s Servant</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Paradox Engine</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Primal Surge</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Primeval Titan</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Prophet of Kruphix</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Recurring Nightmare</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Rofellos, Llanowar Emissary</th><td data-label="Oathbreaker"><span class="status legal">Legal</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Saheeli, the Gifted</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Shahrazad</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Sol Ring</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Sundering Titan</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Sylvan Primordial</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Time Vault</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Time Walk</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Tinker</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Tolarian Academy</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status legal">Legal</span></td><th scope="row">Tooth and Nail</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Trade Secrets</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Upheaval</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+<tr><td data-label="Commander"><span class="status banned">Banned</span></td><th scope="row">Yawgmoth&#x27;s Bargain</th><td data-label="Oathbreaker"><span class="status banned">Banned</span></td></tr>
+    </tbody></table></div>
+    <p class="ban-note"><strong>General bans:</strong> All Conspiracy-type cards, ante cards and cards banned for offensive content are banned in <strong>both</strong> formats. Not listed individually above. Commander also bans <em>Lutri, the Spellchaser</em> as a companion only (the card itself is legal in the 99); this isn't shown as an outright card ban. Oathbreaker additionally excludes cards that introduce stickers or Attractions, and silver-bordered cards.</p>
+    <p class="ban-note">Checked against the official lists on <strong>16 November 2026</strong>. “Legal” means <em>not on that format's ban list</em>, not necessarily permitted under colour identity, card type, the £7.50 cap or other deckbuilding requirements. <a href="https://oathbreakermtg.org/banned-list/" target="_blank" rel="noopener noreferrer">Oathbreaker list</a> · <a href="https://magic.wizards.com/en/banned-restricted-list" target="_blank" rel="noopener noreferrer">Commander list</a></p>
+  </section>
+
+  <div class="divider" role="presentation"></div>
+  <section id="deck-check" aria-labelledby="deck-check-title">
+    <div class="section-head"><span class="kicker">04 · Try your deck</span><h2 id="deck-check-title">Check your deck</h2><p>Paste a decklist and check card counts, official Oathbreaker legality, colour identity and an indicative budget. No login required.</p></div>
+    <div class="check-card">
+      <label class="field" for="decklist">Paste your complete 60-card list</label>
+      <textarea id="decklist" spellcheck="false" placeholder="1 Domri, Anarch of Bolas&#10;1 Ram Through&#10;1 Garruk's Uprising&#10;1 Beast Within&#10;12 Mountain&#10;12 Forest"></textarea>
+      <p class="help">Paste from Archidekt, Moxfield or a plain text list, then select two cards from it as your command zone. Each selected card is taken out of the main deck automatically.</p>
+      <div class="check-grid" style="margin-top:18px">
+        <div><label class="field" for="oathbreaker">Choose Oathbreaker</label><select id="oathbreaker"><option value="">Paste your list first</option></select></div>
+        <div><label class="field" for="signature">Choose Signature Spell</label><select id="signature"><option value="">Paste your list first</option></select></div>
+      </div>
+      <div class="check-grid" style="align-items:center;margin-top:14px">
+        <p class="help" id="pricing-note">EUR → GBP conversion is automatic using the current reference rate. No player input required.</p>
+        <div><button class="btn" id="check-deck" type="button" style="width:100%">Check deck →</button></div>
+      </div>
+      <div id="check-results" class="report" aria-live="polite"></div>
+      <p class="check-note"><strong>Important:</strong> This live beta uses one Scryfall printing per card and its indicative EUR market price, <strong>not the lowest printing across every set</strong>. The currency rate is fetched automatically and shown with its date. Budget results are estimates, not final approval. Mass removal is flagged for manual confirmation; infinite command-zone combos require manual review. Live network access is required.</p>
+    </div>
+  </section>
+
+  <div class="divider" role="presentation"></div>
+  <section id="faq" aria-labelledby="faq-title">
+    <div class="section-head"><span class="kicker">05 · Quick clarifications</span><h2 id="faq-title">A few common questions</h2></div>
+    <div class="faq">
+      <article class="faq-item"><h3>Can I play Windfall, tutors or other powerful cards?</h3><p>Yes. These cards are allowed if they're legal in Oathbreaker and meet the price limits. Strong cards are not banned just for being strong.</p></article>
+      <article class="faq-item"><h3>Can my Signature Spell be an instant or a sorcery?</h3><p>Yes. It must be an instant or sorcery that fits your Oathbreaker's colour identity. Under these house rules it cannot be a mass removal spell.</p></article>
+      <article class="faq-item"><h3>Does Armageddon count as mass removal?</h3><p>Yes. Mass removal includes sweeping away creatures, artifacts, enchantments, lands or other large groups of permanents, not just creature board wipes.</p></article>
+      <article class="faq-item"><h3>Can I return my board wipe from the graveyard?</h3><p>Yes. You can have one mass removal spell in the main deck and reuse it through normal graveyard recursion.</p></article>
+      <article class="faq-item"><h3>Are combos in the main deck allowed?</h3><p>Yes. The explicit combo ban is for infinite combos involving the command-zone cards. The wider guideline is to avoid reliably ending games before other players get involved.</p></article>
+    </div>
+  </section>
+  <section class="closing" aria-label="The golden rule"><h2>Build to win. Let everyone play.</h2><p>Make something memorable, enjoy the big turns and leave room for your friends to fight back.</p><a class="btn" href="https://oathbreakermtg.org/quick-rules/" target="_blank" rel="noopener noreferrer">Official Oathbreaker rules ↗</a></section>
+</main>
+<footer class="footer wrap"><div>Unofficial casual house rules · Not affiliated with Wizards of the Coast</div><div><a href="#top">Back to top ↑</a><a href="https://oathbreakermtg.org/banned-list/" target="_blank" rel="noopener noreferrer">Official ban list ↗</a></div></footer>
+<script>
+  document.getElementById('share').addEventListener('click',async function(){
+    const button=this;
+    try {await navigator.clipboard.writeText(location.href);button.textContent='Link copied ✓';setTimeout(()=>button.textContent='Copy page link ↗',1800)}
+    catch {button.textContent='Copy URL from address bar';setTimeout(()=>button.textContent='Copy page link ↗',2600)}
+  });
+
+  const norm = n => (n||'').toLowerCase().trim().replace(/[’]/g,"'").replace(/\s*\/\/\s*/g,' // ');
+  const html = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const price = n => '£'+n.toFixed(2);
+  const notice=(msg,type='warn')=>`<div class="report-row"><span class="report-${type}">${html(msg)}</span></div>`;
+  function parseDeck(raw){
+    const items=[], errors=[];
+    for(const [idx,line] of raw.split(/\r?\n/).entries()){
+      let t=line.trim(); if(!t||/^\s*(?:\/\/|#)/.test(t)||/^(sideboard|maybeboard|commander|oathbreaker|signature spell)\s*:?$/i.test(t))continue;
+      t=t.replace(/\s+\([A-Z0-9]{2,8}\)\s+\S+\s*$/i,'').replace(/\s+\*F\*$/,'');
+      let m=t.match(/^(\d+)\s*x?\s+(.+?)\s*$/i)||t.match(/^(.+?)\s+x(\d+)$/i);
+      if(!m){errors.push(`Line ${idx+1}: use “1 Card Name”`);continue;}
+      const qty=/^\d+$/.test(m[1])?Number(m[1]):Number(m[2]);
+      const name=(/^\d+$/.test(m[1])?m[2]:m[1]).trim();
+      if(qty<1||qty>60){errors.push(`Line ${idx+1}: invalid quantity`);continue;}
+      items.push({qty,name});
+    }
+    return {items,errors};
+  }
+  const deckInput=document.getElementById('decklist');
+  const oathInput=document.getElementById('oathbreaker');
+  const sigInput=document.getElementById('signature');
+  function syncSelectors(){
+    const parsed=parseDeck(deckInput.value), oldO=oathInput.value, oldS=sigInput.value;
+    const list=[...new Map(parsed.items.map(i=>[norm(i.name),i.name])).values()];
+    const opts='<option value="">Select a card from your list</option>'+list.map(n=>`<option value="${html(n)}">${html(n)}</option>`).join('');
+    oathInput.innerHTML=opts;sigInput.innerHTML=opts;
+    if(list.includes(oldO))oathInput.value=oldO;
+    if(list.includes(oldS))sigInput.value=oldS;
+  }
+  deckInput.addEventListener('input',syncSelectors);
+  syncSelectors();
+  const wipes=new Set(['Armageddon','Wrath of God','Damnation','Farewell','Austere Command','Cyclonic Rift','Blasphemous Act','Vandalblast','Merciless Eviction','Toxic Deluge','Supreme Verdict','Living Death','Devastation','Cataclysm','All Is Dust','Nevinyrral’s Disk','Oblivion Stone','Pernicious Deed']);
+  function mightWipe(card){
+    const text=(card.oracle_text||card.card_faces?.map(f=>f.oracle_text||'').join(' ')||'').toLowerCase();
+    if(wipes.has(card.name))return true;
+    return /(?:destroy|exile|return|sacrifice|bounce) (?:all|each) (?:nonland |other |target |opponent['’]s |of the )*(?:creatures?|artifacts?|enchantments?|lands?|permanents?)/i.test(text)||
+      /(?:all|each) (?:creatures?|artifacts?|enchantments?|lands?|permanents?)(?:[^.]*?)(?:are destroyed|are exiled|to (?:their owners['’] )?hands)/i.test(text)||
+      /(?:deals? \d+ damage to each creature|each player sacrifices (?:all|\d+) (?:creatures?|lands?|permanents?))/i.test(text)||
+      (/overload/i.test(text)&&/return target nonland permanent/i.test(text));
+  }
+  document.getElementById('check-deck').addEventListener('click',async function(){
+    const button=this, out=document.getElementById('check-results');
+    const oath=oathInput.value, sig=sigInput.value,parsed=parseDeck(deckInput.value);
+    if(!oath||!sig||!parsed.items.length){out.innerHTML=notice('Paste a full decklist and select an Oathbreaker and Signature Spell from it.','bad');return;}
+    if(norm(oath)===norm(sig)){out.innerHTML=notice('Oathbreaker and Signature Spell must be different cards.','bad');return;}
+    const main=parsed.items.map(i=>({...i}));
+    for(const name of [oath,sig]){
+      const entry=main.find(i=>norm(i.name)===norm(name)&&i.qty>0);
+      if(!entry){out.innerHTML=notice(`Selected command-zone card not found in your pasted list: ${name}`,'bad');return;}
+      entry.qty--;
+    }
+    const all=[{name:oath,qty:1,role:'Oathbreaker'},{name:sig,qty:1,role:'Signature Spell'},...main.filter(i=>i.qty>0).map(i=>({...i,role:'Main deck'}))];
+    const distinct=new Map();for(const c of all){const k=norm(c.name);if(!distinct.has(k))distinct.set(k,c.name);}
+    button.disabled=true;button.textContent='Checking cards…';out.innerHTML='<p class="help">Retrieving card data and today’s automatic exchange rate…</p>';
+    try{
+      const names=[...distinct.values()], cards=[];
+      const fxPromise=fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=GBP').then(async r=>{if(!r.ok)throw Error('Exchange-rate service unavailable');const data=await r.json();const rate=Number(data.rates?.GBP);if(!(rate>0))throw Error('No valid GBP exchange rate returned');return {rate,date:data.date};}).catch(e=>({error:e.message}));
+      for(let i=0;i<names.length;i+=75){
+        const response=await fetch('https://api.scryfall.com/cards/collection',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({identifiers:names.slice(i,i+75).map(name=>({name}))})});
+        if(!response.ok)throw new Error(`Scryfall lookup returned HTTP ${response.status}.`);
+        const data=await response.json();cards.push(...(data.data||[]));
+      }
+      const fxResult=await fxPromise;
+      const fx=fxResult.rate||null;
+      document.getElementById('pricing-note').textContent=fx?`Automatically converted at €1 = £${fx.toFixed(4)} (reference date ${fxResult.date}).`:`Automatic exchange rate unavailable (${fxResult.error}). Pricing cannot be verified.`;
+      const byName=new Map(cards.map(c=>[norm(c.name),c]));
+      const get=name=>byName.get(norm(name))||cards.find(c=>norm(c.name).split(' // ').includes(norm(name)));
+      const errors=[...parsed.errors],warnings=[],issues=[];
+      const count=all.reduce((a,c)=>a+c.qty,0), mainCount=main.reduce((a,c)=>a+c.qty,0);
+      if(count!==60)errors.push(`Deck has ${count} cards total; exactly 60 required.`);
+      if(mainCount!==58)errors.push(`Main deck has ${mainCount} cards; exactly 58 required.`);
+      const o=get(oath), spell=get(sig);
+      if(!o)errors.push(`Oathbreaker not found: ${oath}`);
+      if(!spell)errors.push(`Signature Spell not found: ${sig}`);
+      if(o&&!/Planeswalker/i.test(o.type_line||''))errors.push(`${oath} is not a planeswalker.`);
+      if(spell&&!/(Instant|Sorcery)/i.test(spell.type_line||''))errors.push(`${sig} is not an instant or sorcery.`);
+      const colors=new Set(o?.color_identity||[]);
+      let sum=0,unpriced=0;
+      const repeats=new Map(),details=[], wipeNames=[];
+      for(const item of all){
+        const card=get(item.name);
+        if(!card){errors.push(`Unknown card: ${item.name}`);continue;}
+        if(card.legalities?.oathbreaker!=='legal')errors.push(`${item.name}: ${card.legalities?.oathbreaker||'unknown'} in Oathbreaker.`);
+        if(o&&(card.color_identity||[]).some(c=>!colors.has(c)))errors.push(`${item.name}: outside Oathbreaker's colour identity.`);
+        if(item.role==='Main deck'&&!/Basic Land/i.test(card.type_line||'')&&!card.oracle_text?.includes('A deck can have any number of cards named')&&!card.oracle_text?.includes('A deck can have up to')&&!card.oracle_text?.includes('Your deck can have any number of cards named')){
+          const k=card.oracle_id||norm(card.name);repeats.set(k,(repeats.get(k)||0)+item.qty);
+        }
+        if(mightWipe(card)){
+          wipeNames.push(`${item.name} (${item.role})`);
+          if(item.role==='Signature Spell')issues.push(`${item.name}: possible mass removal Signature Spell — not permitted under house rules.`);
+        }
+        const eur=card.prices?.eur===null?NaN:Number(card.prices?.eur),gbp=fx&&Number.isFinite(eur)&&eur>0?eur*fx:null;
+        if(gbp===null)unpriced+=item.qty;
+        else{sum+=gbp*item.qty;if(gbp>7.5)issues.push(`${item.name}: ${price(gbp)} exceeds £7.50 per card (indicative printing).`);}
+        details.push({name:card.name,qty:item.qty,gbp});
+      }
+      for(const [k,q] of repeats)if(q>1)errors.push(`Singleton rule: ${details.find(d=>get(d.name)?.oracle_id===k)?.name||'A nonbasic card'} appears ${q} times.`);
+      if(fx&&sum>75)issues.push(`Indicative total ${price(sum)} exceeds £75.`);
+      if(unpriced)warnings.push(`${unpriced} card(s) without a verified GBP price; budget total is incomplete.`);
+      if(wipeNames.length>1)warnings.push(`${wipeNames.length} possible mass-removal entries: ${wipeNames.join('; ')}. House rule allows only one in the main deck.`);
+      else if(wipeNames.length)warnings.push(`Possible mass-removal card: ${wipeNames[0]}. Confirm manually.`);
+      else warnings.push('No obvious mass-removal wording detected; unusual wipes still need manual review.');
+      warnings.push('Infinite command-zone combos require manual review. Prices refer to one returned printing; cheaper regular printings may exist.');
+      const className=errors.length?'bad':issues.length||unpriced?'warn':'good';
+      const summary=errors.length?'Official deckbuilding problems found':issues.length||unpriced?'Budget needs review':'Basic legality checks passed — price approval still provisional';
+      out.innerHTML=`<h3>Deck report</h3>${notice(summary,className)}<div class="report-row"><span>Card count</span><strong>${count} / 60</strong></div><div class="report-row"><span>Indicative value (priced cards)</span><strong>${fx?price(sum):'Unavailable'}</strong></div><div class="report-row"><span>Remaining under £75 (estimate)</span><strong>${fx?price(Math.max(0,75-sum)):'Unavailable'}</strong></div>${errors.map(x=>notice('✕ '+x,'bad')).join('')}${issues.map(x=>notice('! '+x,'warn')).join('')}${warnings.map(x=>notice('ⓘ '+x,'warn')).join('')}<details style="margin-top:16px"><summary>See card prices (${details.length} entries)</summary><div style="overflow-x:auto"><table class="report-table"><thead><tr><th>Card</th><th>Qty</th><th>Price each</th></tr></thead><tbody>${details.map(d=>`<tr><td>${html(d.name)}</td><td>${d.qty}</td><td>${d.gbp===null?'Unpriced':price(d.gbp)}</td></tr>`).join('')}</tbody></table></div></details>`;
+    }catch(err){out.innerHTML=notice('Could not check deck: '+err.message,'bad')+'<p class="help">This browser-only checker requires live access to Scryfall and the exchange-rate source.</p>'}
+    finally{button.disabled=false;button.textContent='Check deck →';}
+  });
+
+</script>
+</body>
+</html>
