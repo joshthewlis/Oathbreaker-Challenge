@@ -135,7 +135,7 @@
 
   <div class="divider" role="presentation"></div>
   <section id="deck-check" aria-labelledby="deck-check-title">
-    <div class="section-head"><span class="kicker">04 · Try your deck</span><h2 id="deck-check-title">Check your deck</h2><p>Paste a decklist and check card counts, official Oathbreaker legality, colour identity and an indicative budget. No login required.</p></div>
+    <div class="section-head"><span class="kicker">04 · Try your deck</span><h2 id="deck-check-title">Check your deck</h2><p>Paste a decklist and check card counts, official Oathbreaker legality, colour identity and cheapest regular-printing reference prices. No login required.</p></div>
     <div class="check-card">
       <label class="field" for="decklist">Paste your complete 60-card list</label>
       <textarea id="decklist" spellcheck="false" placeholder="1 Domri, Anarch of Bolas&#10;1 Ram Through&#10;1 Garruk's Uprising&#10;1 Beast Within&#10;12 Mountain&#10;12 Forest"></textarea>
@@ -145,11 +145,11 @@
         <div><label class="field" for="signature">Choose Signature Spell</label><select id="signature"><option value="">Paste your list first</option></select></div>
       </div>
       <div class="check-grid" style="align-items:center;margin-top:14px">
-        <p class="help" id="pricing-note">EUR → GBP conversion is automatic using the current reference rate. No player input required.</p>
+        <p class="help" id="pricing-note">MTGJSON cheapest-printing prices in GBP; exchange rates update automatically.</p>
         <div><button class="btn" id="check-deck" type="button" style="width:100%">Check deck →</button></div>
       </div>
       <div id="check-results" class="report" aria-live="polite"></div>
-      <p class="check-note"><strong>Important:</strong> This live beta uses one Scryfall printing per card and its indicative EUR market price, <strong>not the lowest printing across every set</strong>. The currency rate is fetched automatically and shown with its date. Budget results are estimates, not final approval. Mass removal is flagged for manual confirmation; infinite command-zone combos require manual review. Live network access is required.</p>
+      <p class="check-note"><strong>Important:</strong> Uses the lowest recorded Cardmarket <strong>normal retail reference price</strong> among eligible MTGJSON printings, converted to GBP automatically. This is a market guide, not a live lowest seller listing. Basic lands count £0.00. Prices are dated, and unpriced cards require review. Mass removal and infinite command-zone combos require manual review.</p>
     </div>
   </section>
 
@@ -209,7 +209,7 @@
   syncSelectors();
   const wipes=new Set(['Armageddon','Wrath of God','Damnation','Farewell','Austere Command','Cyclonic Rift','Blasphemous Act','Vandalblast','Merciless Eviction','Toxic Deluge','Supreme Verdict','Living Death','Devastation','Cataclysm','All Is Dust','Nevinyrral’s Disk','Oblivion Stone','Pernicious Deed']);
   function mightWipe(card){
-    const text=(card.oracle_text||card.card_faces?.map(f=>f.oracle_text||'').join(' ')||'').toLowerCase();
+    const text=(card.text||'').toLowerCase();
     if(wipes.has(card.name))return true;
     return /(?:destroy|exile|return|sacrifice|bounce) (?:all|each) (?:nonland |other |target |opponent['’]s |of the )*(?:creatures?|artifacts?|enchantments?|lands?|permanents?)/i.test(text)||
       /(?:all|each) (?:creatures?|artifacts?|enchantments?|lands?|permanents?)(?:[^.]*?)(?:are destroyed|are exiled|to (?:their owners['’] )?hands)/i.test(text)||
@@ -229,30 +229,26 @@
     }
     const all=[{name:oath,qty:1,role:'Oathbreaker'},{name:sig,qty:1,role:'Signature Spell'},...main.filter(i=>i.qty>0).map(i=>({...i,role:'Main deck'}))];
     const distinct=new Map();for(const c of all){const k=norm(c.name);if(!distinct.has(k))distinct.set(k,c.name);}
-    button.disabled=true;button.textContent='Checking cards…';out.innerHTML='<p class="help">Retrieving card data and today’s automatic exchange rate…</p>';
+    button.disabled=true;button.textContent='Checking cards…';out.innerHTML='<p class="help">Loading the latest published MTGJSON card and price index…</p>';
     try{
-      const names=[...distinct.values()], cards=[];
-      const fxPromise=fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=GBP').then(async r=>{if(!r.ok)throw Error('Exchange-rate service unavailable');const data=await r.json();const rate=Number(data.rates?.GBP);if(!(rate>0))throw Error('No valid GBP exchange rate returned');return {rate,date:data.date};}).catch(e=>({error:e.message}));
-      for(let i=0;i<names.length;i+=75){
-        const response=await fetch('https://api.scryfall.com/cards/collection',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({identifiers:names.slice(i,i+75).map(name=>({name}))})});
-        if(!response.ok)throw new Error(`Scryfall lookup returned HTTP ${response.status}.`);
-        const data=await response.json();cards.push(...(data.data||[]));
-      }
-      const fxResult=await fxPromise;
-      const fx=fxResult.rate||null;
-      document.getElementById('pricing-note').textContent=fx?`Automatically converted at €1 = £${fx.toFixed(4)} (reference date ${fxResult.date}).`:`Automatic exchange rate unavailable (${fxResult.error}). Pricing cannot be verified.`;
-      const byName=new Map(cards.map(c=>[norm(c.name),c]));
-      const get=name=>byName.get(norm(name))||cards.find(c=>norm(c.name).split(' // ').includes(norm(name)));
+      const response=await fetch('cards-index.json',{cache:'no-cache'});
+      if(!response.ok)throw new Error('The MTGJSON price index is not published yet. Run the GitHub Actions workflow first (HTTP '+response.status+').');
+      const index=await response.json();
+      if(!index.cards||!index.meta||!Number.isFinite(index.meta.eurToGbp))throw new Error('Invalid MTGJSON index. Re-run the daily build.');
+      const stamp=index.meta.generated?.slice(0,10)||'unknown date';
+      const fx=index.meta.eurToGbp;
+      document.getElementById('pricing-note').textContent=`MTGJSON/Cardmarket snapshot ${stamp} · €1 = £${fx.toFixed(4)} (FX ${index.meta.fxDate}). No player input.`;
+      const get=name=>index.cards[norm(name)] || index.cards[norm(name).replace(/ \/\/ .*/, '')] || null;
+      const o=get(oath), spell=get(sig);
       const errors=[...parsed.errors],warnings=[],issues=[];
       const count=all.reduce((a,c)=>a+c.qty,0), mainCount=main.reduce((a,c)=>a+c.qty,0);
       if(count!==60)errors.push(`Deck has ${count} cards total; exactly 60 required.`);
       if(mainCount!==58)errors.push(`Main deck has ${mainCount} cards; exactly 58 required.`);
-      const o=get(oath), spell=get(sig);
       if(!o)errors.push(`Oathbreaker not found: ${oath}`);
       if(!spell)errors.push(`Signature Spell not found: ${sig}`);
-      if(o&&!/Planeswalker/i.test(o.type_line||''))errors.push(`${oath} is not a planeswalker.`);
-      if(spell&&!/(Instant|Sorcery)/i.test(spell.type_line||''))errors.push(`${sig} is not an instant or sorcery.`);
-      const colors=new Set(o?.color_identity||[]);
+      if(o&&!/Planeswalker/i.test(o.type||''))errors.push(`${oath} is not a planeswalker.`);
+      if(spell&&!/(Instant|Sorcery)/i.test(spell.type||''))errors.push(`${sig} is not an instant or sorcery.`);
+      const colors=new Set(o?.colors||[]);
       let sum=0,unpriced=0;
       const repeats=new Map(),details=[], wipeNames=[];
       for(const item of all){
@@ -261,32 +257,32 @@
           if(isBasicName(item.name)){details.push({name:item.name,qty:item.qty,gbp:0});continue;}
           errors.push(`Unknown card: ${item.name}`);unpriced+=item.qty;details.push({name:item.name,qty:item.qty,gbp:null});continue;
         }
-        if(card.legalities?.oathbreaker!=='legal')errors.push(`${item.name}: ${card.legalities?.oathbreaker||'unknown'} in Oathbreaker.`);
-        if(o&&(card.color_identity||[]).some(c=>!colors.has(c)))errors.push(`${item.name}: outside Oathbreaker's colour identity.`);
-        if(item.role==='Main deck'&&!isBasicName(item.name)&&!/Basic Land/i.test(card.type_line||'')&&!card.oracle_text?.includes('A deck can have any number of cards named')&&!card.oracle_text?.includes('A deck can have up to')&&!card.oracle_text?.includes('Your deck can have any number of cards named')){
-          const k=card.oracle_id||norm(card.name);repeats.set(k,(repeats.get(k)||0)+item.qty);
+        if(card.legality!=='Legal' && card.legality!=='legal')errors.push(`${item.name}: ${card.legality||'unknown'} in Oathbreaker.`);
+        if(o&&(card.colors||[]).some(c=>!colors.has(c)))errors.push(`${item.name}: outside Oathbreaker's colour identity.`);
+        if(item.role==='Main deck'&&!isBasicName(item.name)&&!/Basic Land/i.test(card.type||'')&&!card.text?.includes('A deck can have any number of cards named')&&!card.text?.includes('A deck can have up to')&&!card.text?.includes('Your deck can have any number of cards named')){
+          const k=norm(card.name);repeats.set(k,(repeats.get(k)||0)+item.qty);
         }
         if(mightWipe(card)){
           wipeNames.push(`${item.name} (${item.role})`);
           if(item.role==='Signature Spell')issues.push(`${item.name}: possible mass removal Signature Spell — not permitted under house rules.`);
         }
-        const isBasicLand=isBasicName(item.name)||/\bBasic Land\b/i.test(card.type_line||'');
-        const eur=card.prices?.eur===null?NaN:Number(card.prices?.eur),gbp=isBasicLand?0:(fx&&Number.isFinite(eur)&&eur>0?eur*fx:null);
+        const isBasicLand=isBasicName(item.name)||/\bBasic Land\b/i.test(card.type||'');
+        const gbp=isBasicLand?0:(typeof card.gbp==='number'&&Number.isFinite(card.gbp)?card.gbp:null);
         if(gbp===null)unpriced+=item.qty;
-        else{sum+=gbp*item.qty;if(gbp>7.5)issues.push(`${item.name}: ${price(gbp)} exceeds £7.50 per card (indicative printing).`);}
-        details.push({name:card.name,qty:item.qty,gbp});
+        else{sum+=gbp*item.qty;if(gbp>7.5)issues.push(`${item.name}: ${price(gbp)} exceeds £7.50 per card (cheapest recorded regular printing, ${card.set||'unknown set'}).`);}
+        details.push({name:card.name,qty:item.qty,gbp,set:card.set||'—'});
       }
-      for(const [k,q] of repeats)if(q>1)errors.push(`Singleton rule: ${details.find(d=>get(d.name)?.oracle_id===k)?.name||'A nonbasic card'} appears ${q} times.`);
-      if(fx&&sum>75)issues.push(`Indicative total ${price(sum)} exceeds £75.`);
-      if(unpriced)warnings.push(`${unpriced} card(s) without a verified GBP price; budget total is incomplete.`);
+      for(const [k,q] of repeats)if(q>1)errors.push(`Singleton rule: ${details.find(d=>norm(d.name)===k)?.name||'A nonbasic card'} appears ${q} times.`);
+      if(sum>75)issues.push(`Cheapest-printing reference total ${price(sum)} exceeds £75.`);
+      if(unpriced)warnings.push(`${unpriced} card(s) without a Cardmarket normal retail price; budget total is incomplete.`);
       if(wipeNames.length>1)warnings.push(`${wipeNames.length} possible mass-removal entries: ${wipeNames.join('; ')}. House rule allows only one in the main deck.`);
       else if(wipeNames.length)warnings.push(`Possible mass-removal card: ${wipeNames[0]}. Confirm manually.`);
       else warnings.push('No obvious mass-removal wording detected; unusual wipes still need manual review.');
-      warnings.push('Infinite command-zone combos require manual review. Prices refer to one returned printing; cheaper regular printings may exist.');
+      warnings.push('Infinite command-zone combos require manual review. Market prices are references, not live seller offers.');
       const className=errors.length?'bad':issues.length||unpriced?'warn':'good';
-      const summary=errors.length?'Official deckbuilding problems found':issues.length||unpriced?'Budget needs review':'Basic legality checks passed — price approval still provisional';
-      out.innerHTML=`<h3>Deck report <small style="font:400 12px/1.4 system-ui,sans-serif;opacity:.58;vertical-align:middle">Checker v1.1</small></h3>${notice(summary,className)}<div class="report-row"><span>Card count</span><strong>${count} / 60</strong></div><div class="report-row"><span>Indicative value (priced cards)</span><strong>${fx?price(sum):'Unavailable'}</strong></div><div class="report-row"><span>Remaining under £75 (estimate)</span><strong>${fx?price(Math.max(0,75-sum)):'Unavailable'}</strong></div>${errors.map(x=>notice('✕ '+x,'bad')).join('')}${issues.map(x=>notice('! '+x,'warn')).join('')}${warnings.map(x=>notice('ⓘ '+x,'warn')).join('')}<details style="margin-top:16px"><summary>See card prices (${details.length} entries)</summary><div style="overflow-x:auto"><table class="report-table"><thead><tr><th>Card</th><th>Qty</th><th>Price each</th></tr></thead><tbody>${details.map(d=>`<tr><td>${html(d.name)}</td><td>${d.qty}</td><td>${d.gbp===null?'Unpriced':price(d.gbp)}</td></tr>`).join('')}</tbody></table></div></details>`;
-    }catch(err){out.innerHTML=notice('Could not check deck: '+err.message,'bad')+'<p class="help">This browser-only checker requires live access to Scryfall and the exchange-rate source.</p>'}
+      const summary=errors.length?'Official deckbuilding problems found':issues.length||unpriced?'Budget needs review':'Automated checks passed — review house-rule interactions';
+      out.innerHTML=`<h3>Deck report <small style="font:400 12px/1.4 system-ui,sans-serif;opacity:.58;vertical-align:middle">Checker v2.0 · MTGJSON</small></h3>${notice(summary,className)}<div class="report-row"><span>Card count</span><strong>${count} / 60</strong></div><div class="report-row"><span>Cheapest-printing value (priced cards)</span><strong>${price(sum)}</strong></div><div class="report-row"><span>Remaining under £75</span><strong>${price(Math.max(0,75-sum))}</strong></div>${errors.map(x=>notice('✕ '+x,'bad')).join('')}${issues.map(x=>notice('! '+x,'warn')).join('')}${warnings.map(x=>notice('ⓘ '+x,'warn')).join('')}<details style="margin-top:16px"><summary>See card prices (${details.length} entries)</summary><div style="overflow-x:auto"><table class="report-table"><thead><tr><th>Card</th><th>Qty</th><th>Cheapest set</th><th>Price each</th></tr></thead><tbody>${details.map(d=>`<tr><td>${html(d.name)}</td><td>${d.qty}</td><td>${html(d.set||'—')}</td><td>${d.gbp===null?'Unpriced':price(d.gbp)}</td></tr>`).join('')}</tbody></table></div></details>`;
+    }catch(err){out.innerHTML=notice('Could not check deck: '+err.message,'bad')+'<p class="help">Publish the MTGJSON index using GitHub Actions. The site does not contact Scryfall for prices.</p>'}
     finally{button.disabled=false;button.textContent='Check deck →';}
   });
 
