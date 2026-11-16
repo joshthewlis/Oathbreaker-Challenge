@@ -177,6 +177,8 @@
   const norm = n => (n||'').toLowerCase().trim().replace(/[’]/g,"'").replace(/\s*\/\/\s*/g,' // ');
   const html = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const price = n => '£'+n.toFixed(2);
+  const basicNames=new Set(['plains','island','swamp','mountain','forest','wastes','snow-covered plains','snow-covered island','snow-covered swamp','snow-covered mountain','snow-covered forest']);
+  const isBasicName=name=>basicNames.has(norm(name));
   const notice=(msg,type='warn')=>`<div class="report-row"><span class="report-${type}">${html(msg)}</span></div>`;
   function parseDeck(raw){
     const items=[], errors=[];
@@ -255,17 +257,20 @@
       const repeats=new Map(),details=[], wipeNames=[];
       for(const item of all){
         const card=get(item.name);
-        if(!card){errors.push(`Unknown card: ${item.name}`);continue;}
+        if(!card){
+          if(isBasicName(item.name)){details.push({name:item.name,qty:item.qty,gbp:0});continue;}
+          errors.push(`Unknown card: ${item.name}`);unpriced+=item.qty;details.push({name:item.name,qty:item.qty,gbp:null});continue;
+        }
         if(card.legalities?.oathbreaker!=='legal')errors.push(`${item.name}: ${card.legalities?.oathbreaker||'unknown'} in Oathbreaker.`);
         if(o&&(card.color_identity||[]).some(c=>!colors.has(c)))errors.push(`${item.name}: outside Oathbreaker's colour identity.`);
-        if(item.role==='Main deck'&&!/Basic Land/i.test(card.type_line||'')&&!card.oracle_text?.includes('A deck can have any number of cards named')&&!card.oracle_text?.includes('A deck can have up to')&&!card.oracle_text?.includes('Your deck can have any number of cards named')){
+        if(item.role==='Main deck'&&!isBasicName(item.name)&&!/Basic Land/i.test(card.type_line||'')&&!card.oracle_text?.includes('A deck can have any number of cards named')&&!card.oracle_text?.includes('A deck can have up to')&&!card.oracle_text?.includes('Your deck can have any number of cards named')){
           const k=card.oracle_id||norm(card.name);repeats.set(k,(repeats.get(k)||0)+item.qty);
         }
         if(mightWipe(card)){
           wipeNames.push(`${item.name} (${item.role})`);
           if(item.role==='Signature Spell')issues.push(`${item.name}: possible mass removal Signature Spell — not permitted under house rules.`);
         }
-        const isBasicLand=/\bBasic Land\b/i.test(card.type_line||'');
+        const isBasicLand=isBasicName(item.name)||/\bBasic Land\b/i.test(card.type_line||'');
         const eur=card.prices?.eur===null?NaN:Number(card.prices?.eur),gbp=isBasicLand?0:(fx&&Number.isFinite(eur)&&eur>0?eur*fx:null);
         if(gbp===null)unpriced+=item.qty;
         else{sum+=gbp*item.qty;if(gbp>7.5)issues.push(`${item.name}: ${price(gbp)} exceeds £7.50 per card (indicative printing).`);}
@@ -280,7 +285,7 @@
       warnings.push('Infinite command-zone combos require manual review. Prices refer to one returned printing; cheaper regular printings may exist.');
       const className=errors.length?'bad':issues.length||unpriced?'warn':'good';
       const summary=errors.length?'Official deckbuilding problems found':issues.length||unpriced?'Budget needs review':'Basic legality checks passed — price approval still provisional';
-      out.innerHTML=`<h3>Deck report</h3>${notice(summary,className)}<div class="report-row"><span>Card count</span><strong>${count} / 60</strong></div><div class="report-row"><span>Indicative value (priced cards)</span><strong>${fx?price(sum):'Unavailable'}</strong></div><div class="report-row"><span>Remaining under £75 (estimate)</span><strong>${fx?price(Math.max(0,75-sum)):'Unavailable'}</strong></div>${errors.map(x=>notice('✕ '+x,'bad')).join('')}${issues.map(x=>notice('! '+x,'warn')).join('')}${warnings.map(x=>notice('ⓘ '+x,'warn')).join('')}<details style="margin-top:16px"><summary>See card prices (${details.length} entries)</summary><div style="overflow-x:auto"><table class="report-table"><thead><tr><th>Card</th><th>Qty</th><th>Price each</th></tr></thead><tbody>${details.map(d=>`<tr><td>${html(d.name)}</td><td>${d.qty}</td><td>${d.gbp===null?'Unpriced':price(d.gbp)}</td></tr>`).join('')}</tbody></table></div></details>`;
+      out.innerHTML=`<h3>Deck report <small style="font:400 12px/1.4 system-ui,sans-serif;opacity:.58;vertical-align:middle">Checker v1.1</small></h3>${notice(summary,className)}<div class="report-row"><span>Card count</span><strong>${count} / 60</strong></div><div class="report-row"><span>Indicative value (priced cards)</span><strong>${fx?price(sum):'Unavailable'}</strong></div><div class="report-row"><span>Remaining under £75 (estimate)</span><strong>${fx?price(Math.max(0,75-sum)):'Unavailable'}</strong></div>${errors.map(x=>notice('✕ '+x,'bad')).join('')}${issues.map(x=>notice('! '+x,'warn')).join('')}${warnings.map(x=>notice('ⓘ '+x,'warn')).join('')}<details style="margin-top:16px"><summary>See card prices (${details.length} entries)</summary><div style="overflow-x:auto"><table class="report-table"><thead><tr><th>Card</th><th>Qty</th><th>Price each</th></tr></thead><tbody>${details.map(d=>`<tr><td>${html(d.name)}</td><td>${d.qty}</td><td>${d.gbp===null?'Unpriced':price(d.gbp)}</td></tr>`).join('')}</tbody></table></div></details>`;
     }catch(err){out.innerHTML=notice('Could not check deck: '+err.message,'bad')+'<p class="help">This browser-only checker requires live access to Scryfall and the exchange-rate source.</p>'}
     finally{button.disabled=false;button.textContent='Check deck →';}
   });
